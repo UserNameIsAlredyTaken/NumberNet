@@ -115,9 +115,11 @@
   <ItemGroup>
     <ClCompile Include="get_train_data.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="net.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="get_data.h" />
+    <ClInclude Include="net.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
