@@ -1,0 +1,3 @@
+﻿  get_train_data.c
+c:\users\danil\desktop\numbernet\net\net\get_train_data.c(26): warning C4101: item: неиспользованная локальная переменная
+  Net.vcxproj -> C:\Users\danil\Desktop\NumberNet\Net\Debug\Net.exe
