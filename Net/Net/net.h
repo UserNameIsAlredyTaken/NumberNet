@@ -7,3 +7,4 @@ typedef struct net {
 }net;
 
 net* init_net(int* sizes, int n_layers);
+double* neurons_output(double* input, net* const the_net);
