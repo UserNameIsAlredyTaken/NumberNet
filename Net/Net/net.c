@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdint.h>
+#include "get_data.h"
 
 typedef struct net {
 	int n_layers;
@@ -74,5 +75,32 @@ double* neurons_output(uint8_t* input,net* const the_net){
 	printf("\n");
 	printf("\n");
 	return input_prev;	
+}
+
+void shuffle(train_d* old_td, int size){
+	int j;
+	for(int i = 0;i<size;i++){
+		j = rand() % size;// TODO: проверить правильность перемешивания (особенно функцию rand())
+		char tmp_y = old_td[i].y;
+		old_td[i].y = old_td[j].y;
+		old_td[j].y = tmp_y;
+		char tmp_x = old_td[i].x;
+		*old_td[i].x = old_td[j].x;
+		*old_td[j].x = tmp_x;
+	}
+}
+
+void update_mb(train_d* mb,int nb_size, double lr, net the_net){
+	// TODO: написать логику update_mb
+}
+
+void gradient_descent(train_d* td,int td_length, int n_epohs, int mini_batch_size, double learning_rate,net the_net){
+	for(int i = 0;i < n_epohs;i++){
+		shuffle(td,td_length);//В каждой эпохе заново перемешиваем весь тренировочный сет		
+		for(int j = 0;j<td_length / mini_batch_size;j++){//проходимся по всем батчам, применяя к каждому update_mb
+			update_mb((td+j*mini_batch_size),mini_batch_size,learning_rate,the_net);
+		}
+		printf("Epoch %d is done", i);
+	}
 }
 
