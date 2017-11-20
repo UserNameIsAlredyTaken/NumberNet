@@ -1,3 +1,4 @@
-﻿  main.c
-c:\users\danil\desktop\numbernet\net\net\main.c(16): warning C4133: функция: несовместимые типы - из "char [784]" в "double *"
+﻿  net.c
+c:\users\danil\desktop\numbernet\net\net\net.c(82): warning C4047: =: "char" отличается по уровням косвенного обращения от "char *"
+c:\users\danil\desktop\numbernet\net\net\net.c(81): warning C4047: инициализация: "char" отличается по уровням косвенного обращения от "char *"
   Net.vcxproj -> C:\Users\danil\Desktop\NumberNet\Net\Debug\Net.exe

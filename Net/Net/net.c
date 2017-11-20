@@ -12,36 +12,30 @@ typedef struct net {
 	double*** weights;
 }net;
 
-net* init_net(int* sizes,int n_layers){
+net* init_net(int* sizes,int const n_layers){
 	net* the_net = malloc(sizeof(net));
 	the_net->sizes = sizes;
 	the_net->n_layers = n_layers;
 	the_net->biases = (double**)malloc(sizeof(double*)*(n_layers-1));
-	for (int i = 1; i < n_layers;i++){//заполняем биасы для каждого нейронного слоя кроме первого
+	the_net->weights = (double***)malloc(sizeof(double**)*(n_layers - 1));
+	for (int i = 1; i < n_layers;i++){//заполняем биасы/веса для каждого нейронного слоя кроме первого
 		the_net->biases[i] = (double*)malloc(sizeof(double)*sizes[i]);
-		for (int j = 0; j < sizes[i];j++){//заполняем биасы для каждого нейрона			
+		the_net->weights[i] = (double**)malloc(sizeof(double*)*sizes[i]);
+		for (int j = 0; j < sizes[i];j++){//заполняем биасы/веса для каждого нейрона	
+			
 			srand(((i*3467897)^(j*78951))%1328098134);//жалкие попытки написать реальный рандом
 			the_net->biases[i][j] = -1 + (rand() % 20000)*0.0001;//рандомящая функция с диапозоном от -1 до 1
-			printf("b[%d][%d]:%f ",i,j,the_net->biases[i][j]);
-		}
-		printf("\n");
-	}
-	printf("\n");
-	printf("\n");
-	the_net->weights = (double***)malloc(sizeof(double**)*n_layers-1);
-	for (int i = 1; i < n_layers; i++){//заполняем биасы для каждого нейронного слоя кроме первого
-		the_net->weights[i] = (double**)malloc(sizeof(double*)*sizes[i]);
-		for (int j = 0; j < sizes[i]; j++){//заполняем веса для каждого нейрона
-			the_net->weights[i][j] = (double*)malloc(sizeof(double)*sizes[i-1]);
-			printf("[");
-			for(int k = 0; k < sizes[i-1]; k++){//В каждый нейрон входит столько весов, сколько в предыдущем слое нейронов
-				srand((((i * 3497) ^ (j * 751))^(k*4428)) % 7215242);
-				the_net->weights[i][j][k] = -1 + (rand() % 20000)*0.0001;//рандомящая функция с диапозоном от -1 до 1
+
+			printf("b[%d][%d]:%f", i, j, the_net->biases[i][j]);
+			the_net->weights[i][j] = (double*)malloc(sizeof(double)*sizes[i - 1]); printf("{");
+			for (int k = 0; k < sizes[i - 1]; k++) {//заполняем веса для каждого нейрона (по количеству нейронов в предыдущем слое)
+
+				srand((((i * 3497) ^ (j * 751)) ^ (k * 4428)) % 7215242);
+				the_net->weights[i][j][k] = -1 + (rand() % 20000)*0.0001;
+
 				printf("w[%d][%d][%d]:%f ", i, j, k, the_net->weights[i][j][k]);
-			}
-			printf("]");
-		}
-		printf("\n");
+			} printf("} ");
+		} printf("\n");
 	}
 	return the_net;
 }
@@ -72,8 +66,7 @@ double* neurons_output(uint8_t* input,net* const the_net){
 		input_prev = input_next;
 		input_next = (double*)malloc(sizeof(double)*the_net->sizes[i+1]);
 	}
-	printf("\n");
-	printf("\n");
+	printf("\n\n");
 	return input_prev;	
 }
 
@@ -90,11 +83,32 @@ void shuffle(train_d* old_td, int size){
 	}
 }
 
-void update_mb(train_d* mb,int nb_size, double lr, net the_net){
-	// TODO: написать логику update_mb
+void update_mb(train_d* mb,int mb_size, double lr, net* the_net){
+	net* gradients_net = malloc(sizeof(net));//инициализируем слепок с полученной методом сети, и заполняем все биасы/веса нулями
+	gradients_net->biases = (double**)malloc(sizeof(double*)*(the_net->n_layers - 1));
+	gradients_net->weights = (double***)malloc(sizeof(double**)*(the_net->n_layers - 1));
+	for (int i = 1; i < the_net->n_layers; i++) {
+		gradients_net->biases[i] = (double*)malloc(sizeof(double)*the_net->sizes[i]);
+		gradients_net->weights[i] = (double**)malloc(sizeof(double*)*the_net->sizes[i]);
+		for (int j = 0; j < the_net->sizes[i]; j++) {
+			
+			gradients_net->biases[i][j] = 0;
+
+			printf("b[%d][%d]:%f", i, j, gradients_net->biases[i][j]);
+			gradients_net->weights[i][j] = (double*)malloc(sizeof(double)*the_net->sizes[i - 1]); printf("{");
+			for (int k = 0; k < the_net->sizes[i - 1]; k++) {
+				
+				gradients_net->weights[i][j][k] = 0;
+
+				printf("w[%d][%d][%d]:%f ", i, j, k, gradients_net->weights[i][j][k]);
+			} printf("} ");
+		} printf("\n");
+	}
+
+
 }
 
-void gradient_descent(train_d* td,int td_length, int n_epohs, int mini_batch_size, double learning_rate,net the_net){
+void gradient_descent(train_d* td,int td_length, int n_epohs, int mini_batch_size, double learning_rate,net* the_net){
 	for(int i = 0;i < n_epohs;i++){
 		shuffle(td,td_length);//В каждой эпохе заново перемешиваем весь тренировочный сет		
 		for(int j = 0;j<td_length / mini_batch_size;j++){//проходимся по всем батчам, применяя к каждому update_mb
