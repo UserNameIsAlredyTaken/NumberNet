@@ -75,7 +75,7 @@ double* neurons_output(uint8_t* const input,net* const the_net){
 void shuffle(train_d* old_td, int size){
 	int j;
 	for(int i = 0;i<size;i++){
-		j = rand() % size;// TODO: test the function (especially this palace)
+		j = rand() % size;
 		char tmp_y = old_td[i].y;
 		old_td[i].y = old_td[j].y;
 		old_td[j].y = tmp_y;
@@ -85,35 +85,53 @@ void shuffle(train_d* old_td, int size){
 	}
 }
 
-void update_mb(train_d* mb,int mb_size, double lr, net* the_net){
-	net* gradients_net = malloc(sizeof(net));//initializing copy of the obtaind by method net and fill all biases\weights by zeros
-	gradients_net->biases = (double**)malloc(sizeof(double*)*(the_net->n_layers - 1));
-	gradients_net->weights = (double***)malloc(sizeof(double**)*(the_net->n_layers - 1));
-	for (int i = 1; i < the_net->n_layers; i++) {
-		gradients_net->biases[i] = (double*)malloc(sizeof(double)*the_net->sizes[i]);
-		gradients_net->weights[i] = (double**)malloc(sizeof(double*)*the_net->sizes[i]);
-		for (int j = 0; j < the_net->sizes[i]; j++) {
-			
-			gradients_net->biases[i][j] = 0;
+static net* backpropagation(train_d x_y_tuple,net* net_template);//TODO write the backprogration function
 
-			printf("b[%d][%d]:%f", i, j, gradients_net->biases[i][j]);
-			gradients_net->weights[i][j] = (double*)malloc(sizeof(double)*the_net->sizes[i - 1]); printf("{");
-			for (int k = 0; k < the_net->sizes[i - 1]; k++) {
-				
-				gradients_net->weights[i][j][k] = 0;
-
-				printf("w[%d][%d][%d]:%f ", i, j, k, gradients_net->weights[i][j][k]);
-			} printf("} ");
-		} printf("\n");
+static net* init_zero_net(net* net_template){
+	net* zero_net = malloc(sizeof(net));//initializing copy of the obtaind net and fill all biases\weights by zeros
+	zero_net->biases = (double**)malloc(sizeof(double*)*(net_template->n_layers - 1));
+	zero_net->weights = (double***)malloc(sizeof(double**)*(net_template->n_layers - 1));
+	for (int i = 1; i < net_template->n_layers; i++){
+		zero_net->biases[i] = (double*)malloc(sizeof(double)*net_template->sizes[i]);
+		zero_net->weights[i] = (double**)malloc(sizeof(double*)*net_template->sizes[i]);
+		for (int j = 0; j < net_template->sizes[i]; j++){
+			zero_net->biases[i][j] = 0;
+			zero_net->weights[i][j] = (double*)malloc(sizeof(double)*net_template->sizes[i - 1]); printf("{");
+			for (int k = 0; k < net_template->sizes[i - 1]; k++){
+				zero_net->weights[i][j][k] = 0;
+			}
+		}
 	}
+	return zero_net;
+}
 
-
+static void update_mb(train_d* mb,int mb_size, double lr, net* the_net){ //TODO test the update_mb function
+	net* gradients_net = init_zero_net(the_net);
+	for(int l = 0; l<mb_size;l++){
+		net* delta_gradient_net = backpropagation(*(mb+l*sizeof(train_d)),the_net);//applying backpropagation method
+		for (int i = 1; i < the_net->n_layers; i++){ //summing delta_gradient_net with gradient net
+			for (int j = 0; j < the_net->sizes[i]; j++){
+				gradients_net->biases[i][j]+=delta_gradient_net->biases[i][j];
+				for (int k = 0; k < the_net->sizes[i - 1]; k++){
+					gradients_net->weights[i][j][k] += delta_gradient_net->weights[i][j][k];
+				}
+			}
+		}
+	}
+	for (int i = 1; i < the_net->n_layers; i++){ //updating weights\biases
+		for (int j = 0; j < the_net->sizes[i]; j++){
+			the_net->biases[i][j] = the_net->biases[i][j]-(lr/mb_size)*gradients_net->biases[i][j];
+			for (int k = 0; k < the_net->sizes[i - 1]; k++){
+				gradients_net->weights[i][j][k] = gradients_net->weights[i][j][k]-(lr/mb_size)*gradients_net->weights[i][j][k];
+			}
+		}
+	}
 }
 
 void gradient_descent(train_d* td,int td_length, int n_epohs, int mini_batch_size, double learning_rate,net* the_net){
 	for(int i = 0;i < n_epohs;i++){
 		shuffle(td,td_length);//for each epoch shuffle whole training set
-		for(int j = 0;j<td_length / mini_batch_size;j++){//iterate aplying "update_mb" for each batch
+		for(int j = 0;j<td_length / mini_batch_size;j++){//iterate aplying "update_mb" for each batch(td_length div mini_batch_size should be =0(just a convention))
 			update_mb((td+j*mini_batch_size),mini_batch_size,learning_rate,the_net);
 		}
 		printf("Epoch %d is done", i);
