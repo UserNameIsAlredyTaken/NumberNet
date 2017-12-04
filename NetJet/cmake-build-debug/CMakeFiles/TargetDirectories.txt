@@ -1,0 +1,3 @@
+C:/Users/danil/Desktop/NumberNet/NetJet/cmake-build-debug/CMakeFiles/NetJet.dir
+C:/Users/danil/Desktop/NumberNet/NetJet/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/danil/Desktop/NumberNet/NetJet/cmake-build-debug/CMakeFiles/rebuild_cache.dir
