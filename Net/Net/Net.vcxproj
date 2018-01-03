@@ -113,7 +113,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="get_train_data.c" />
+    <ClCompile Include="get_data.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="net.c" />
   </ItemGroup>

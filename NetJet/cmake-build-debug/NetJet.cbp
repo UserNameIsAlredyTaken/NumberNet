@@ -80,7 +80,7 @@
 		<Unit filename="C:/Users/danil/Desktop/NumberNet/NetJet/head/net.h">
 			<Option target="NetJet"/>
 		</Unit>
-		<Unit filename="C:/Users/danil/Desktop/NumberNet/NetJet/src/get_train_data.c">
+		<Unit filename="C:/Users/danil/Desktop/NumberNet/NetJet/src/get_data.c">
 			<Option target="NetJet"/>
 		</Unit>
 		<Unit filename="C:/Users/danil/Desktop/NumberNet/NetJet/src/main.c">

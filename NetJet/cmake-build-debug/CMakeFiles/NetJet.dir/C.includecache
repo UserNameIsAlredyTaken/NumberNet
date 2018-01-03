@@ -12,7 +12,7 @@ stdint.h
 
 C:/Users/danil/Desktop/NumberNet/NetJet/head/net.h
 
-C:/Users/danil/Desktop/NumberNet/NetJet/src/get_train_data.c
+C:/Users/danil/Desktop/NumberNet/NetJet/src/get_data.c
 stdint.h
 -
 stdio.h
@@ -32,8 +32,6 @@ stdio.h
 
 C:/Users/danil/Desktop/NumberNet/NetJet/src/net.c
 stdlib.h
--
-time.h
 -
 stdio.h
 -

@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/NetJet.dir/src/main.c.obj"
-  "CMakeFiles/NetJet.dir/src/get_train_data.c.obj"
+  "CMakeFiles/NetJet.dir/src/get_data.c.obj"
   "CMakeFiles/NetJet.dir/src/net.c.obj"
   "NetJet.pdb"
   "NetJet.exe"

@@ -5,7 +5,7 @@ set(CMAKE_C_STANDARD 99)
 
 set(SOURCE_FILES
         src/main.c
-        src/get_train_data.c
+        src/get_data.c
         src/net.c
 
         head/get_data.h

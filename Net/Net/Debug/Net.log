@@ -1,8 +1,2 @@
 ﻿  net.c
-c:\users\danil\desktop\numbernet\net\net\net.c(81): warning C4047: =: "char" отличается по уровням косвенного обращения от "char *"
-c:\users\danil\desktop\numbernet\net\net\net.c(80): warning C4047: инициализация: "char" отличается по уровням косвенного обращения от "char *"
-  main.c
-c:\users\danil\desktop\numbernet\net\net\main.c(13): warning C4133: функция: несовместимые типы - из "uint8_t [2]" в "double *"
-  get_train_data.c
-  Создание кода...
   Net.vcxproj -> C:\Users\danil\Desktop\NumberNet\Net\Debug\Net.exe
