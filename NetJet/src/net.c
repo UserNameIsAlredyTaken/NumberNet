@@ -96,20 +96,17 @@ double* neurons_output(uint8_t* input, net* const the_net) {
     return input_prev;
 }
 
-static void shuffle(data* old_d, int size) {
+void shuffle(data* old_d, int size) {
     int j;
     for (int i = 0; i<size; i++) {
         j = rand() % size;
-        uint8_t* tmp_y = old_d[i].y;
-        *old_d[i].y = *old_d[j].y;
-        *old_d[j].y = *tmp_y;
-        uint8_t* tmp_x = old_d[i].x;
-        *old_d[i].x = *old_d[j].x;
-        *old_d[j].x = *tmp_x;
+        data tmp = old_d[i];
+        old_d[i] = old_d[j];
+        old_d[j] = tmp;
     }
 }
 
-static net* init_zero_net(net* net_template) {
+net* init_zero_net(net* net_template) {
     net* zero_net = malloc(sizeof(net));///initializing copy of the obtaind net and fill all biases\weights by zeros
     zero_net->sizes = net_template->sizes;
     zero_net->n_layers = net_template->n_layers;
@@ -120,11 +117,14 @@ static net* init_zero_net(net* net_template) {
         zero_net->weights[i] = (double**)malloc(sizeof(double*)*net_template->sizes[i]);
         for (int j = 0; j < net_template->sizes[i]; j++) {
             zero_net->biases[i][j] = 0;
+            //printf("b[%d][%d]:%f", i, j, zero_net->biases[i][j]);
             zero_net->weights[i][j] = (double*)malloc(sizeof(double)*net_template->sizes[i - 1]); //printf("{");
             for (int k = 0; k < net_template->sizes[i - 1]; k++) {
                 zero_net->weights[i][j][k] = 0;
-            }
-        }
+
+                //printf("w[%d][%d][%d]:%f ", i, j, k, zero_net->weights[i][j][k]);
+            }//printf("} ");
+        }//printf("\n");
     }
     return zero_net;
 }
@@ -193,7 +193,6 @@ static net* backpropagation(data* x_y_tuple, net* the_net) {//TODO test backprop
         free(weighted_input[i]);
     }
     free(forward_layer_error);
-    //free(activation_value[the_net->n_layers-1]);
     free(activation_value);
     free(weighted_input);
 
@@ -217,31 +216,33 @@ static void update_mb(data* mb, int mb_size, double lr, net* the_net) {
     }
     for (int i = 1; i < the_net->n_layers; i++) { //updating weights\biases
         for (int j = 0; j < the_net->sizes[i]; j++) {
-            the_net->biases[i][j] = the_net->biases[i][j] - (lr / mb_size)*gradients_net->biases[i][j];
+            the_net->biases[i][j] -= (lr / mb_size)*gradients_net->biases[i][j];
             for (int k = 0; k < the_net->sizes[i - 1]; k++) {
-                gradients_net->weights[i][j][k] = gradients_net->weights[i][j][k] - (lr / mb_size)*gradients_net->weights[i][j][k];
+                gradients_net->weights[i][j][k] -= (lr / mb_size)*gradients_net->weights[i][j][k];
             }
         }
     }
     clean_all(gradients_net);
 }
 
-static int check(data* test_d, net* the_net) {
+static int check(data* test_d, int test_d_lenght, net* the_net) {
     int counter = 0;
-    double max = 0;
-    int max_i = -1;
-    int y = -2;
-    double* actual_output = neurons_output(test_d->x, the_net);
-    for (int i = 0; i<10; i++){
-        if (actual_output[i]>max){
-            max = actual_output[i];
-            max_i = i;
+    for (int i = 0; i < test_d_lenght; i++) {
+        double max = 0;
+        int max_i = -1;
+        int y = -2;
+        double* actual_output = neurons_output(test_d[i].x, the_net);
+        for (int j = 0; j<10; j++) {
+            if (actual_output[j]>max) {
+                max = actual_output[j];
+                max_i = j;
+            }
+            if (test_d[i].y[j] == 1) {
+                y = j;
+            }
         }
-        if (test_d->y[i] == 1) {
-            y = i;
-        }
+        if (y == max_i) {counter++;}
     }
-    if (y == max_i) { counter++; }
     return counter;
 }
 
@@ -249,11 +250,10 @@ void gradient_descent(data* train_d, int train_d_length, int n_epohs, int mini_b
     //printf("gradient_descent\n");
     for (int i = 0; i < n_epohs; i++) {
         shuffle(train_d, train_d_length);///for each epoch shuffle whole training set
-        for (int j = 0; j<train_d_length / mini_batch_size; j++) {///iterate applying "update_mb" for each batch(train_d_length div mini_batch_size should be =0(just a convention))
-            update_mb((train_d + j*mini_batch_size), mini_batch_size, learning_rate, the_net);
+        for (int j = 0; j<train_d_length; j+=mini_batch_size) {///iterate applying "update_mb" for each batch(train_d_length div mini_batch_size should be =0(just a convention))
+            update_mb(&train_d[j], mini_batch_size, learning_rate, the_net);
         }
-        //printf("Epoch %d: %d/%d\n", i, check(test_d, the_net), test_d_length);
-        printf("Epoch %d\n", i);
+        printf("Epoch %d: %d/%d\n", i, check(test_d, test_d_length, the_net), test_d_length);
     }
 }
 

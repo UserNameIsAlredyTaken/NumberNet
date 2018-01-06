@@ -29,6 +29,12 @@ stdint.h
 -
 stdio.h
 -
+stdlib.h
+-
+time.h
+-
+math.h
+-
 
 C:/Users/danil/Desktop/NumberNet/NetJet/src/net.c
 stdlib.h
