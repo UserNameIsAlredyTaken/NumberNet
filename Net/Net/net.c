@@ -67,6 +67,17 @@ static double cost_deriv(double const actual_output, uint8_t const expecting_out
 	return actual_output - expecting_output;
 }
 
+static double* softmax(double* last_layer, int length){
+	double denominator = 0;
+	for (int i = 0; i < length; i++) {
+		denominator += exp(last_layer[i]);
+	}
+	for (int i = 0; i < length;i++) {
+		last_layer[i] = exp(last_layer[i]) / denominator;
+	}
+	return last_layer;
+}
+
 /*INPUT is the vector of data, and pointer to the net structure
 *OUTPUT is the pointer to result vector
 *(lenth of the vector should be the same as the count of neurons in the input layer of the net(just a convention)),*/
@@ -76,25 +87,27 @@ double* neurons_output(uint8_t* input, net* const the_net) {
 	for (int i = 0; i<the_net->sizes[0]; i++) {///converting input uint8_t data to double
 		input_prev[i] = input[i];
 	}
-	for (int i = 1; i<the_net->n_layers; i++) {
+	for (int i = 1; i<the_net->n_layers; i++) {///iterate for each neuron layer except the last one 
 		for (int j = 0; j < the_net->sizes[i]; j++) {///iterate for each neuron
 			double weighed_sum = 0;
 			for (int k = 0; k < the_net->sizes[i - 1]; k++) {///summing the input neuron's values multiplying by weights
 				weighed_sum += input_prev[k] * the_net->weights[i][j][k];
 			}
-			input_next[j] = sigmoid_func(weighed_sum + the_net->biases[i][j]);
+			input_next[j] = sigmoid_func(weighed_sum + the_net->biases[i][j]);		
+			
 
-			/*printf("%f:", weighed_sum + the_net->biases[i][j]);
+			/*printf("%f:", weighed_sum + the_net->biases[i][j]);*/
 			printf("%f ", input_next[j]);
-			printf("\n");*/
+			//printf("\n");*/
 
-		}
+		}printf("\n");
 		free(input_prev);
 		input_prev = input_next;
 		input_next = (double*)malloc(sizeof(double)*the_net->sizes[i + 1]);
 	}
 	free(input_next);
-	//printf("\n\n");
+	printf("\n\n");	
+	//return softmax(input_prev, the_net->sizes[the_net->n_layers - 1]);///implemtnting softmax funnction
 	return input_prev;
 }
 
@@ -138,8 +151,8 @@ static net* backpropagation(data* x_y_tuple, net* the_net) {//TODO test backprop
 	for (int i = 0; i<NUMBER_OF_PIXELS; i++) {///initializing first layer of activation_value by x values		
 		activation_value[0][i] = (double)x_y_tuple->x[i];
 	}
-
 	double** weighted_input = (double**)malloc(sizeof(double*)*(the_net->n_layers));///array with all weighted inputs vrctors
+	int last_index = the_net->n_layers - 1;///initializing the index of the last layer
 
 
 	///moving forvard
@@ -156,9 +169,9 @@ static net* backpropagation(data* x_y_tuple, net* the_net) {//TODO test backprop
 			activation_value[i][j] = sigmoid_func(weighted_input[i][j]);
 		}
 	}
+	activation_value[last_index] = softmax(activation_value[last_index], the_net->sizes[last_index]);
 
-	///computing output error
-	int last_index = the_net->n_layers - 1;//initializing the index of the last layer
+	///computing output error	
 	double* forward_layer_error = (double*)malloc(sizeof(double)*the_net->sizes[last_index]);//initializing output error
 	for (int j = 0; j<the_net->sizes[last_index]; j++) {///iterate for the last layer
 		forward_layer_error[j] = cost_deriv(activation_value[last_index][j], x_y_tuple->y[j])*cost_deriv(activation_value[last_index][j], x_y_tuple->y[j]);
@@ -278,23 +291,23 @@ void gradient_descent(data* train_d, int train_d_length, int n_epohs, int mini_b
 			update_mb(&train_d[j], mini_batch_size, learning_rate, the_net);
 		}
 
-		/*for (int j = 0; j < 15; j++) {
-			printf("b1:%f\n", the_net->biases[1][j]);
-		}printf("\n");
+		for (int j = 0; j < 15; j++) {
+			printf("b1:%f ", the_net->biases[1][j]);
+		}printf("\n\n");
 
 		for (int j = 0; j < 10; j++) {
-			printf("b2:%f\n", the_net->biases[2][j]);
-		}printf("\n");*/
+			printf("b2:%f ", the_net->biases[2][j]);
+		}printf("\n\n\n");
 
-		/*for (int j = 0; j < 10; j++) {
-		for (int k = 0; k < 10; k++) {
-		printf("w[%d][%d]:%f ", j, k, the_net->weights[2][j][k]);
-		}printf("\n\n");
+		for (int j = 0; j < 10; j++) {
+			for (int k = 0; k < 10; k++) {
+				printf("w[%d][%d]:%f ", j, k, the_net->weights[2][j][k]);
+			}printf("\n\n");
 		}
 
 		double* output = neurons_output(test_d[i].x, the_net);
-		for (int i = 0; i < 10; i++) {
-			printf("out:%d\n", output[i]);
+		/*for (int i = 0; i < 10; i++) {
+			printf("out:%f\n", output[i]);
 		}*/
 
 		printf("Epoch %d: %d/%d\n", i, check(test_d, test_d_length, the_net), test_d_length);		
