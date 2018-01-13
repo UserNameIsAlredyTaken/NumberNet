@@ -23,7 +23,6 @@ static void clean_all(net* net){
 	}
 	free(net->weights);
 	free(net->biases);
-	//free(net->sizes);
 	free(net);
 }
 
@@ -63,7 +62,6 @@ static double sigmoid_deriv(double const weighed_inp) {
 }
 
 static double cost_deriv(double const actual_output, uint8_t const expecting_output) {
-	double d = actual_output - expecting_output;
 	return actual_output - expecting_output;
 }
 
@@ -97,18 +95,18 @@ double* neurons_output(uint8_t* input, net* const the_net) {
 			
 
 			/*printf("%f:", weighed_sum + the_net->biases[i][j]);*/
-			printf("%f ", input_next[j]);
+			//printf("%f ", input_next[j]);
 			//printf("\n");*/
 
-		}printf("\n");
+		}//printf("\n");
 		free(input_prev);
 		input_prev = input_next;
 		input_next = (double*)malloc(sizeof(double)*the_net->sizes[i + 1]);
 	}
 	free(input_next);
-	printf("\n\n");	
-	//return softmax(input_prev, the_net->sizes[the_net->n_layers - 1]);///implemtnting softmax funnction
-	return input_prev;
+	//printf("\n\n");	
+	return softmax(input_prev, the_net->sizes[the_net->n_layers - 1]);///implemtnting softmax funnction
+	//return input_prev;
 }
 
 void shuffle(data* old_d, int size) {
@@ -144,14 +142,14 @@ static net* init_zero_net(net* net_template) {
 	return zero_net;
 }
 
-static net* backpropagation(data* x_y_tuple, net* the_net) {//TODO test backpropagation method
+static net* backpropagation(data* x_y_tuple, net* the_net) {
 	net* delta_gradient_net = init_zero_net(the_net);
 	double** activation_value = (double**)malloc(sizeof(double*)*the_net->n_layers);///array with all activations vectors
 	activation_value[0] = (double*)malloc(sizeof(double)*NUMBER_OF_PIXELS);
 	for (int i = 0; i<NUMBER_OF_PIXELS; i++) {///initializing first layer of activation_value by x values		
 		activation_value[0][i] = (double)x_y_tuple->x[i];
 	}
-	double** weighted_input = (double**)malloc(sizeof(double*)*(the_net->n_layers));///array with all weighted inputs vrctors
+	double** weighted_input = (double**)malloc(sizeof(double*)*the_net->n_layers);///array with all weighted inputs vrctors
 	int last_index = the_net->n_layers - 1;///initializing the index of the last layer
 
 
@@ -174,7 +172,7 @@ static net* backpropagation(data* x_y_tuple, net* the_net) {//TODO test backprop
 	///computing output error	
 	double* forward_layer_error = (double*)malloc(sizeof(double)*the_net->sizes[last_index]);//initializing output error
 	for (int j = 0; j<the_net->sizes[last_index]; j++) {///iterate for the last layer
-		forward_layer_error[j] = cost_deriv(activation_value[last_index][j], x_y_tuple->y[j])*cost_deriv(activation_value[last_index][j], x_y_tuple->y[j]);
+		forward_layer_error[j] = cost_deriv(activation_value[last_index][j], x_y_tuple->y[j])*sigmoid_deriv(weighted_input[last_index][j]);
 
 		/*printf("cost_d: %f ", cost_deriv(activation_value[last_index][j], x_y_tuple->y[j]));
 		printf("sig_d: %f ", cost_deriv(activation_value[last_index][j], x_y_tuple->y[j]));
@@ -210,6 +208,7 @@ static net* backpropagation(data* x_y_tuple, net* the_net) {//TODO test backprop
 		for (int i = 0; i<the_net->sizes[i]; i++) {///initializing first layer of activation_value by x values		
 			forward_layer_error[i] = layer_error[i];
 		}
+		free(layer_error);
 	}
 	free(activation_value[0]);
 	for (int i = 1; i < the_net->n_layers; i++) {
@@ -239,14 +238,14 @@ static void update_mb(data* mb, int mb_size, double lr, net* the_net) {
 			for (int j = 0; j < the_net->sizes[i]; j++) {
 				gradients_net->biases[i][j] += delta_gradient_net->biases[i][j];
 
-				//printf("dgb[%d][%d]:%f ",i,j,delta_gradient_net->biases[i][j]);
+				//printf("dgb[%d][%d]:%f ",i,j, delta_gradient_net->biases[i][j]);
 
 				for (int k = 0; k < the_net->sizes[i - 1]; k++) {
 					gradients_net->weights[i][j][k] += delta_gradient_net->weights[i][j][k];
 					//printf("dgw[%d][%d][%d]:%f ", i, j,k, delta_gradient_net->weights[i][j][k]);
 				}
 			}//printf("\n");
-		}
+		}//printf("\n\n\n");
 		clean_all(delta_gradient_net);///freeing memory
 	}
 	for (int i = 1; i < the_net->n_layers; i++) { //updating weights\biases
@@ -284,6 +283,20 @@ static int check(data* test_d, int test_d_lenght, net* the_net) {
 	return counter;
 }
 
+static double cost_func(data* test_d, int test_d_lenght, net* the_net) {
+	double cost_sum=0;
+	for (int i = 0; i < test_d_lenght; i++) {
+		double* actual_output = neurons_output(test_d[i].x, the_net);
+		double vector_length=0;
+		for (int j = 0; j < 10;j++){
+			vector_length += pow(test_d[i].y[j] - actual_output[j],2);
+		}
+		vector_length = sqrt(vector_length);
+		cost_sum += vector_length;
+	}
+	return cost_sum / (2 * test_d_lenght);
+}
+
 void gradient_descent(data* train_d, int train_d_length, int n_epohs, int mini_batch_size, double learning_rate, net* the_net, data* test_d, int test_d_length) {
 	for (int i = 0; i < n_epohs; i++) {
 		shuffle(train_d, train_d_length);///for each epoch shuffle whole training set
@@ -297,20 +310,20 @@ void gradient_descent(data* train_d, int train_d_length, int n_epohs, int mini_b
 
 		for (int j = 0; j < 10; j++) {
 			printf("b2:%f ", the_net->biases[2][j]);
-		}printf("\n\n\n");
+		}printf("\n");
 
-		for (int j = 0; j < 10; j++) {
+		/*for (int j = 0; j < 10; j++) {
 			for (int k = 0; k < 10; k++) {
 				printf("w[%d][%d]:%f ", j, k, the_net->weights[2][j][k]);
 			}printf("\n\n");
-		}
-
-		double* output = neurons_output(test_d[i].x, the_net);
-		/*for (int i = 0; i < 10; i++) {
-			printf("out:%f\n", output[i]);
 		}*/
 
-		printf("Epoch %d: %d/%d\n", i, check(test_d, test_d_length, the_net), test_d_length);		
+		double* output = neurons_output(test_d[i].x, the_net);
+		for (int i = 0; i < 10; i++) {
+			printf("out:%f\n", output[i]);
+		}
+
+		printf("Epoch %d: %d/%d\n\n\n", i, check(test_d, test_d_length, the_net), test_d_length);			
 	}
 }
 
