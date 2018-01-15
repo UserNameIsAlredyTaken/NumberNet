@@ -10,9 +10,9 @@
 int main(int argc, char* argv[]) {
 	data* train_data = get_data("C:\\Users\\danil\\Desktop\\NumberNet\\Net\\Net\\train-labels.idx1-ubyte", "C:\\Users\\danil\\Desktop\\NumberNet\\Net\\Net\\train-images.idx3-ubyte", TRAIN_DATA_LENGTH);
 	data* test_data = get_data("C:\\Users\\danil\\Desktop\\NumberNet\\Net\\Net\\t10k-labels.idx1-ubyte", "C:\\Users\\danil\\Desktop\\NumberNet\\Net\\Net\\t10k-images.idx3-ubyte", TEST_DATA_LENGTH);
-	int sizes[] = { 784,10,10 };	
+	int sizes[] = { 784,30,10 };	
 	net* the_net = init_net(sizes, sizeof(sizes) / sizeof(int));	
 
-	gradient_descent(train_data, TRAIN_DATA_LENGTH, 30, 10, 0.2, the_net, test_data, TEST_DATA_LENGTH);
+	gradient_descent(train_data, TRAIN_DATA_LENGTH, 30, 10, 0.3, the_net, test_data, TEST_DATA_LENGTH, test_data[0]);
 	return 0;
 }
