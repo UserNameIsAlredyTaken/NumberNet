@@ -1,3 +1,4 @@
 ﻿  net.c
 c:\users\danil\desktop\numbernet\net\net\net.c(30): warning C4013: time: нет определения; предполагается "extern" с возвратом типа "int"
+c:\users\danil\desktop\numbernet\net\net\net.c(323): warning C4477: "printf": в строке форматирования "%f" требуется аргумент типа "double", но вариативный аргумент "1" имеет тип "uint8_t *"
   Net.vcxproj -> C:\Users\danil\Desktop\NumberNet\Net\Debug\Net.exe

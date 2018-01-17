@@ -105,8 +105,8 @@ double* neurons_output(uint8_t* input, net* const the_net) {
 	}
 	free(input_next);
 	//printf("\n\n");	
-	return softmax(input_prev, the_net->sizes[the_net->n_layers - 1]);///implemtnting softmax funnction
-	//return input_prev;
+	//return softmax(input_prev, the_net->sizes[the_net->n_layers - 1]);///implemtnting softmax funnction
+	return input_prev;
 }
 
 void shuffle(data* old_d, int size) {
@@ -250,12 +250,14 @@ static void update_mb(data* mb, int mb_size, double lr, net* the_net) {
 	}
 	for (int i = 1; i < the_net->n_layers; i++) { //updating weights\biases
 		for (int j = 0; j < the_net->sizes[i]; j++) {
-			the_net->biases[i][j] -= (lr / mb_size)*gradients_net->biases[i][j];
+			//the_net->biases[i][j] -= (lr / mb_size)*gradients_net->biases[i][j];
+			the_net->biases[i][j] -= lr*gradients_net->biases[i][j];
 
 			//printf("b[%d][%d]:%f ", i, j, the_net->biases[i][j]);
 
 			for (int k = 0; k < the_net->sizes[i - 1]; k++) {
-				the_net->weights[i][j][k] -= (lr / mb_size)*gradients_net->weights[i][j][k];
+				//the_net->weights[i][j][k] -= lr*gradients_net->weights[i][j][k];
+				the_net->weights[i][j][k] -= lr*gradients_net->weights[i][j][k];
 			}
 		}//printf("\n");
 	}	
@@ -297,7 +299,7 @@ static double cost_func(data* test_d, int test_d_lenght, net* the_net) {
 	return cost_sum / (2 * test_d_lenght);
 }
 
-void gradient_descent(data* train_d, int train_d_length, int n_epohs, int mini_batch_size, double learning_rate, net* the_net, data* test_d, int test_d_length, data the_test) {
+void gradient_descent(data* train_d, int train_d_length, int n_epohs, int mini_batch_size, double learning_rate, net* the_net, data* test_d, int test_d_length) {
 	for (int i = 0; i < n_epohs; i++) {
 		shuffle(train_d, train_d_length);///for each epoch shuffle whole training set
 		for (int j = 0; j<train_d_length; j+=mini_batch_size) {///iterate applying "update_mb" for each batch(train_d_length div mini_batch_size should be =0(just a convention))		
@@ -318,7 +320,8 @@ void gradient_descent(data* train_d, int train_d_length, int n_epohs, int mini_b
 			}printf("\n\n");
 		}*/
 
-		double* output = neurons_output(the_test.x, the_net);
+		printf("Value:%f\n", test_d[i].y);
+		double* output = neurons_output(test_d[i].y, the_net);
 		for (int i = 0; i < 10; i++) {
 			printf("out:%f\n", output[i]);
 		}

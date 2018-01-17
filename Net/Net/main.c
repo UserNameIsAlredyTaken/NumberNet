@@ -13,6 +13,7 @@ int main(int argc, char* argv[]) {
 	int sizes[] = { 784,30,10 };	
 	net* the_net = init_net(sizes, sizeof(sizes) / sizeof(int));	
 
-	gradient_descent(train_data, TRAIN_DATA_LENGTH, 30, 10, 0.3, the_net, test_data, TEST_DATA_LENGTH, test_data[0]);
+	gradient_descent(train_data, TRAIN_DATA_LENGTH, 30, 10, 0.3, the_net, test_data, TEST_DATA_LENGTH);
 	return 0;
 }
+ 
