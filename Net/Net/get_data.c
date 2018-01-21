@@ -12,7 +12,7 @@ typedef struct data {
 }data;
 #pragma pack(pop)
 
-static void from_number_to_vector(uint8_t number, data* td) {///the value of namber ranges from 0-9
+static void from_number_to_vector(uint8_t const number, data* td) {///the value of namber ranges from 0-9
 	for (int j = 0; j<10; j++) {
 		if (j == number) {
 			td->y[j] = 1;
@@ -23,8 +23,7 @@ static void from_number_to_vector(uint8_t number, data* td) {///the value of nam
 	}
 }
 
-data* get_data(char *lables_file_name, char *images_file_name, int number_of_items) {
-	//printf("get_data\n");
+data* get_data(char *lables_file_name, char *images_file_name, int const number_of_items) {	
 	FILE *lables_file = fopen(lables_file_name, "rb");
 	FILE *images_file = fopen(images_file_name, "rb");
 	data* x_y_array = malloc(number_of_items * sizeof(data));
@@ -37,4 +36,10 @@ data* get_data(char *lables_file_name, char *images_file_name, int number_of_ite
 	fclose(lables_file);
 	fclose(images_file);
 	return x_y_array;
+}
+
+void save_net(char *file_name, struct net* final_net) {
+	FILE *file = fopen(file_name, "wb");
+	fwrite(final_net, sizeof(struct net*), 1, file);
+	fclose(file);
 }

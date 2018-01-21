@@ -1,14 +1,14 @@
 #pragma once
-typedef struct net {
-	int n_layers;
-	int* sizes;
+struct net {
+	size_t n_layers;
+	size_t* sizes;
 	int** biases;
 	int*** weights;
-}net;
+};
 
-net* init_net(int* sizes, int n_layers);
-double* neurons_output(double* input, net* const the_net);
-void gradient_descent(data* train_d, int train_d_length, int n_epohs, int mini_batch_size, double learning_rate, net* the_net, data* test_d, int test_d_length);
-void shuffle(data* old_d, int size);
-net* init_zero_net(net* net_template);
+struct net* init_net(int* sizes, int n_layers);
+double* neurons_output(double* input, struct net* const the_net);
+struct net gradient_descent(struct data* train_d, int const train_d_length, int const n_epohs, int const mini_batch_size, double const learning_rate, struct net* the_net, struct data* test_d, int const test_d_length);
+void shuffle(struct data* old_d, int const size);
+struct net* init_zero_net(struct net* net_template);
 double sigmoid_func(double const weighed_inp);

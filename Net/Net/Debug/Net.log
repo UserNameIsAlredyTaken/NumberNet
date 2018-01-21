@@ -1,4 +1,18 @@
 ﻿  net.c
 c:\users\danil\desktop\numbernet\net\net\net.c(30): warning C4013: time: нет определения; предполагается "extern" с возвратом типа "int"
-c:\users\danil\desktop\numbernet\net\net\net.c(323): warning C4477: "printf": в строке форматирования "%f" требуется аргумент типа "double", но вариативный аргумент "1" имеет тип "uint8_t *"
+c:\users\danil\desktop\numbernet\net\net\net.c(39): warning C4018: <: несоответствие типов со знаком и без знака
+c:\users\danil\desktop\numbernet\net\net\net.c(45): warning C4018: <: несоответствие типов со знаком и без знака
+c:\users\danil\desktop\numbernet\net\net\net.c(70): warning C4018: <: несоответствие типов со знаком и без знака
+c:\users\danil\desktop\numbernet\net\net\net.c(73): warning C4018: <: несоответствие типов со знаком и без знака
+c:\users\danil\desktop\numbernet\net\net\net.c(114): warning C4018: <: несоответствие типов со знаком и без знака
+c:\users\danil\desktop\numbernet\net\net\net.c(249): warning C4018: <: несоответствие типов со знаком и без знака
+c:\users\danil\desktop\numbernet\net\net\net.c(282): warning C4018: <: несоответствие типов со знаком и без знака
+c:\users\danil\desktop\numbernet\net\net\net.c(303): warning C4018: <: несоответствие типов со знаком и без знака
+c:\users\danil\desktop\numbernet\net\net\net.c(316): warning C4018: <: несоответствие типов со знаком и без знака
+c:\users\danil\desktop\numbernet\net\net\net.c(318): warning C4018: <: несоответствие типов со знаком и без знака
+c:\users\danil\desktop\numbernet\net\net\net.c(322): warning C4018: <: несоответствие типов со знаком и без знака
+c:\users\danil\desktop\numbernet\net\net\net.c(326): warning C4018: <: несоответствие типов со знаком и без знака
+c:\users\danil\desktop\numbernet\net\net\net.c(336): warning C4477: "printf": в строке форматирования "%f" требуется аргумент типа "double", но вариативный аргумент "1" имеет тип "uint8_t *"
+  main.c
+  Создание кода...
   Net.vcxproj -> C:\Users\danil\Desktop\NumberNet\Net\Debug\Net.exe
